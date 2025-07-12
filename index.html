@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PennyWise</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter (for a modern look), Montserrat (for headings) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, #1A202C, #2D3748, #4A5568); /* Dark to lighter gray gradient */
+        }
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Splash Screen Animations */
+        @keyframes splash-pop-in {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-splash-pop-in {
+            animation: splash-pop-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes splash-fade-in {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-splash-fade-in {
+            animation: splash-fade-in 1s ease-in forwards;
+            animation-delay: 0.5s;
+        }
+
+        /* General UI animations */
+        @keyframes fade-in {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-out forwards;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+        .modal-content {
+            animation: fade-in 0.3s ease-out forwards;
+        }
+
+        /* Custom class to hide elements */
+        .app-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 bg-gradient-to-br from-indigo-900 to-blue-900 flex flex-col items-center justify-center text-white z-50 transition-opacity duration-700 ease-out opacity-100">
+        <div class="text-6xl md:text-8xl mb-6 text-yellow-400 animate-splash-pop-in">
+            <i class="fas fa-piggy-bank"></i>
+        </div>
+        <h1 class="text-7xl md:text-8xl font-extrabold mb-4 drop-shadow-lg tracking-wider animate-splash-pop-in font-montserrat" style="animation-delay: 0.2s;">
+            PennyWise
+        </h1>
+        <p class="text-3xl md:text-4xl font-semibold text-blue-200 animate-splash-fade-in font-inter" style="animation-delay: 0.7s;">
+            Smart Budget. Brighter Future.
+        </p>
+    </div>
+
+    <!-- Main Application Content -->
+    <div id="app-root" class="min-h-screen bg-gray-900 text-gray-100 flex flex-col items-center p-4 relative overflow-x-hidden app-hidden">
+        <!-- Background subtle pattern/gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 opacity-70 z-0"></div>
+
+        <!-- Top Navigation Bar -->
+        <nav class="w-full bg-gray-800 bg-opacity-70 backdrop-blur-md p-4 shadow-xl fixed top-0 left-0 z-20 flex justify-center items-center rounded-b-lg border-b border-gray-700">
+            <div class="flex space-x-6">
+                <button id="dashboard-tab" class="py-3 px-8 rounded-full text-lg font-bold transition-all duration-300 ease-in-out transform shadow-lg bg-green-600 text-white hover:bg-green-700 hover:scale-105">
+                    <i class="fas fa-chart-line mr-2"></i>Dashboard
+                </button>
+                <button id="insights-tab" class="py-3 px-8 rounded-full text-lg font-bold transition-all duration-300 ease-in-out transform shadow-lg bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white">
+                    <i class="fas fa-lightbulb mr-2"></i>Insights
+                </button>
+                <button id="goals-tab" class="py-3 px-8 rounded-full text-lg font-bold transition-all duration-300 ease-in-out transform shadow-lg bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white">
+                    <i class="fas fa-bullseye mr-2"></i>Goals
+                </button>
+                <button id="settings-tab" class="py-3 px-8 rounded-full text-lg font-bold transition-all duration-300 ease-in-out transform shadow-lg bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white">
+                    <i class="fas fa-cog mr-2"></i>Settings
+                </button>
+            </div>
+        </nav>
+
+        <header id="app-header" class="w-full max-w-6xl text-center text-white mb-8 flex flex-col items-center justify-center relative z-10 pt-24 animate-fade-in">
+            <h1 class="text-5xl md:text-6xl font-extrabold drop-shadow-lg tracking-wide font-montserrat text-green-400">
+                PennyWise
+            </h1>
+            <p class="text-xl md:text-2xl mt-4 text-blue-200 font-light leading-relaxed font-inter">
+                Your Smart Budget. For a Brighter Future.
+            </p>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="w-full max-w-4xl relative z-10 p-4">
+            <!-- Dashboard View -->
+            <section id="dashboard-view" class="bg-gray-800 bg-opacity-70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-12 animate-fade-in border border-gray-700">
+                <h2 class="text-4xl font-extrabold text-center mb-8 text-green-300 font-montserrat">
+                    Your Financial Snapshot
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600">
+                        <h3 class="text-xl font-semibold text-blue-300 mb-2 font-inter">Current Balance</h3>
+                        <p class="text-5xl font-bold text-white font-montserrat" id="current-balance">$0.00</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600">
+                        <h3 class="text-xl font-semibold text-red-300 mb-2 font-inter">Monthly Expenses</h3>
+                        <p class="text-5xl font-bold text-white font-montserrat" id="monthly-expenses">$0.00</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold text-green-300 mb-4 font-montserrat">Spending by Category (Monthly)</h3>
+                    <div id="category-spending-summary" class="space-y-4">
+                        <!-- Category spending summaries will be injected here -->
+                        <p class="text-gray-400 text-center font-inter" id="no-category-spending">No expenses recorded yet.</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold text-green-300 mb-4 font-montserrat">Recent Transactions</h3>
+                    <ul id="recent-transactions-list" class="space-y-3">
+                        <!-- Recent transactions will be injected here -->
+                        <p class="text-gray-400 text-center font-inter" id="no-transactions">No transactions recorded yet.</p>
+                    </ul>
+                </div>
+
+                <button id="add-expense-btn" class="w-full py-4 rounded-xl text-xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl font-montserrat">
+                    <i class="fas fa-plus-circle mr-2"></i>Add New Expense
+                </button>
+            </section>
+
+            <!-- Insights View (hidden by default) -->
+            <section id="insights-view" class="bg-gray-800 bg-opacity-70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-12 animate-fade-in border border-gray-700 hidden">
+                <h2 class="text-4xl font-extrabold text-center mb-8 text-yellow-300 font-montserrat">
+                    Smart Savings Insights
+                </h2>
+                <p class="text-center text-lg md:text-xl mb-8 text-gray-300 font-inter">
+                    Get personalized recommendations to optimize your spending and boost your savings.
+                </p>
+
+                <div id="insights-container" class="space-y-6 mb-8">
+                    <!-- Insights will be injected here -->
+                    <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600 animate-fade-in">
+                        <h3 class="text-xl font-semibold text-yellow-200 mb-2 font-inter">Welcome Insight!</h3>
+                        <p class="text-gray-200 font-inter">Start by adding your income and expenses to get personalized insights tailored to your financial habits.</p>
+                    </div>
+                </div>
+
+                <button id="generate-insights-btn" class="w-full py-4 rounded-xl text-xl font-bold bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl font-montserrat">
+                    <i class="fas fa-magic mr-2"></i>Generate More Insights
+                </button>
+                <div id="insights-loading" class="flex justify-center items-center mt-4 space-x-3 hidden">
+                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8 border-t-purple-500"></div>
+                    <p class="text-gray-400 font-inter">Brewing new financial wisdom...</p>
+                </div>
+            </section>
+
+            <!-- Goals View (hidden by default) -->
+            <section id="goals-view" class="bg-gray-800 bg-opacity-70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-12 animate-fade-in border border-gray-700 hidden">
+                <h2 class="text-4xl font-extrabold text-center mb-8 text-blue-300 font-montserrat">
+                    Your Financial Goals
+                </h2>
+                <p class="text-center text-lg md:text-xl mb-8 text-gray-300 font-inter">
+                    Set your financial targets and track your progress towards a brighter future.
+                </p>
+
+                <div id="goals-list" class="space-y-6 mb-8">
+                    <!-- Goals will be injected here -->
+                    <p class="text-gray-400 text-center font-inter" id="no-goals">No goals set yet. Add your first goal below!</p>
+                </div>
+
+                <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600">
+                    <h3 class="text-2xl font-semibold text-blue-300 mb-4 font-montserrat">Add New Goal</h3>
+                    <div class="mb-4">
+                        <label for="goal-name" class="block text-gray-300 text-lg font-inter mb-2">Goal Name:</label>
+                        <input type="text" id="goal-name" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 font-inter" placeholder="e.g., Vacation to Bali">
+                    </div>
+                    <div class="mb-6">
+                        <label for="goal-amount" class="block text-gray-300 text-lg font-inter mb-2">Target Amount ($):</label>
+                        <input type="number" id="goal-amount" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 font-inter" placeholder="e.g., 5000">
+                    </div>
+                    <button id="add-goal-btn" class="w-full py-4 rounded-xl text-xl font-bold bg-gradient-to-r from-teal-500 to-green-600 text-white shadow-lg hover:from-teal-600 hover:to-green-700 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl font-montserrat">
+                        <i class="fas fa-plus mr-2"></i>Add Goal
+                    </button>
+                </div>
+
+                <!-- Goal Recommendations Section -->
+                <div id="goal-recommendations-section" class="mt-8 p-6 bg-gray-700 rounded-3xl shadow-2xl border border-blue-600 hidden animate-fade-in">
+                    <h3 class="text-3xl font-extrabold text-center mb-6 text-orange-300 font-montserrat" id="goal-recommendations-title">
+                        Recommendations for Your Goal
+                    </h3>
+                    <div id="goal-recommendations-list" class="space-y-4">
+                        <!-- Recommendations will be injected here -->
+                    </div>
+                    <button id="close-recommendations-btn" class="mt-6 w-full py-3 rounded-xl text-lg font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg hover:from-red-600 hover:to-orange-600 transition-all duration-300 ease-in-out transform hover:-translate-y-1 font-montserrat">
+                        Close Recommendations
+                    </button>
+                </div>
+            </section>
+
+             <!-- Settings View (hidden by default) -->
+            <section id="settings-view" class="bg-gray-800 bg-opacity-70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-12 animate-fade-in border border-gray-700 hidden">
+                <h2 class="text-4xl font-extrabold text-center mb-8 text-purple-300 font-montserrat">
+                    App Settings
+                </h2>
+                <p class="text-center text-lg md:text-xl mb-8 text-gray-300 font-inter">
+                    Customize your PennyWise experience.
+                </p>
+
+                <div class="space-y-6">
+                    <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600">
+                        <h3 class="text-2xl font-semibold text-purple-200 mb-4 font-inter">Update Bank Balance</h3>
+                        <div class="mb-4">
+                            <label for="manual-balance-input" class="block text-gray-300 text-lg font-inter mb-2">Enter Current Balance ($):</label>
+                            <input type="number" id="manual-balance-input" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 font-inter" placeholder="e.g., 5000.00">
+                        </div>
+                        <button id="update-balance-btn" class="w-full py-3 rounded-xl text-xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl font-montserrat">
+                            <i class="fas fa-sync-alt mr-2"></i>Update Balance
+                        </button>
+                    </div>
+
+                    <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600">
+                        <h3 class="text-2xl font-semibold text-purple-200 mb-4 font-inter">Manage Categories</h3>
+                        <ul id="category-list" class="space-y-3 mb-4">
+                            <!-- Categories will be listed here -->
+                        </ul>
+                        <div class="flex gap-2">
+                            <input type="text" id="new-category-input" class="flex-grow p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 font-inter" placeholder="New Category Name">
+                            <button id="add-category-btn" class="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-bold">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600">
+                        <h3 class="text-2xl font-semibold text-purple-200 mb-4 font-inter">Set Monthly Budgets</h3>
+                        <div id="budget-limits-container" class="space-y-4">
+                             <!-- Budget limits will be listed here -->
+                             <p class="text-gray-400 text-center font-inter" id="no-budgets-set">No categories with budgets set yet. Add categories above first.</p>
+                        </div>
+                        <button id="save-budgets-btn" class="mt-6 w-full py-3 rounded-xl text-xl font-bold bg-gradient-to-r from-green-500 to-teal-600 text-white shadow-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl font-montserrat">
+                            Save Budgets
+                        </button>
+                    </div>
+
+                    <div class="bg-gray-700 p-6 rounded-2xl shadow-lg border border-gray-600">
+                        <h3 class="text-2xl font-semibold text-purple-200 mb-4 font-inter">Reset App Data</h3>
+                        <p class="text-gray-300 mb-4 font-inter">Warning: This will clear all your expenses, goals, and categories!</p>
+                        <button id="reset-app-btn" class="w-full py-3 rounded-xl text-xl font-bold bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl font-montserrat">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Reset All Data
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div id="add-expense-modal" class="fixed inset-0 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 p-8 rounded-3xl shadow-2xl modal-content w-full max-w-md border border-gray-700">
+            <h2 class="text-3xl font-bold text-center mb-6 text-green-300 font-montserrat">Add New Expense</h2>
+            <div class="mb-4">
+                <label for="expense-description" class="block text-gray-300 text-lg font-inter mb-2">Description:</label>
+                <input type="text" id="expense-description" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-500 font-inter" placeholder="e.g., Coffee at Cafe X">
+            </div>
+            <div class="mb-4">
+                <label for="expense-amount" class="block text-gray-300 text-lg font-inter mb-2">Amount ($):</label>
+                <input type="number" id="expense-amount" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-500 font-inter" placeholder="e.g., 5.50">
+            </div>
+            <div class="mb-4">
+                <label for="expense-category" class="block text-gray-300 text-lg font-inter mb-2">Category:</label>
+                <select id="expense-category" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white font-inter">
+                    <!-- Categories will be dynamically loaded here -->
+                </select>
+            </div>
+            <div class="mb-6">
+                <label for="expense-date" class="block text-gray-300 text-lg font-inter mb-2">Date:</label>
+                <input type="date" id="expense-date" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white font-inter">
+            </div>
+            <div class="flex justify-end gap-4">
+                <button id="cancel-expense-btn" class="py-3 px-6 rounded-lg bg-gray-600 text-white font-bold hover:bg-gray-700 transition-colors font-montserrat">Cancel</button>
+                <button id="save-expense-btn" class="py-3 px-6 rounded-lg bg-green-600 text-white font-bold hover:bg-green-700 transition-colors font-montserrat">Add Expense</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Global State ---
+        let appState = {
+            currentView: 'dashboard', // 'dashboard', 'insights', 'goals', 'settings'
+            currentBalance: 5000.00, // Initial balance
+            expenses: [], // { id, description, amount, category, date }
+            goals: [], // { id, name, target, saved }
+            categories: ['Groceries', 'Utilities', 'Rent', 'Transport', 'Entertainment', 'Dining Out', 'Shopping', 'Health', 'Education', 'Salary'],
+            budgetLimits: {
+                // categoryName: limitAmount
+                'Groceries': 400,
+                'Utilities': 150,
+                'Rent': 1000,
+                'Transport': 100,
+                'Entertainment': 80,
+                'Dining Out': 120,
+                'Shopping': 200,
+                'Health': 50,
+                'Education': 30,
+            },
+            loadingInsights: false,
+            selectedGoalForRecommendations: null, // New: Tracks which goal's recommendations are shown
+            // Dummy insights, to be replaced by AI generation or more complex logic
+            generalInsights: [ // Renamed from dummyInsights
+                (spending) => `You've spent $${spending['Dining Out'] ? spending['Dining Out'].toFixed(2) : '0.00'} on dining out this month. Consider cooking at home more often to save an estimated $50-$100!`,
+                (spending) => `Your entertainment spending is $${spending['Entertainment'] ? spending['Entertainment'].toFixed(2) : '0.00'}. Try free activities or look for discounts to stay within your budget.`,
+                (spending) => `Great job managing your rent! It's a significant expense, and keeping it stable is key to financial health.`,
+                (spending) => `Your transport costs ($${spending['Transport'] ? spending['Transport'].toFixed(2) : '0.00'}) seem manageable. Exploring public transport or cycling could offer further savings.`,
+                (spending) => `Groceries are at $${spending['Groceries'] ? spending['Groceries'].toFixed(2) : '0.00'}. Planning your meals and making a list before shopping can help reduce impulse buys and waste.`,
+                (spending) => `You're doing well with your budget overall! Keep tracking your expenses diligently for continued financial clarity.`,
+                (spending) => `Review your monthly subscriptions. Even small forgotten payments can add up to significant savings over time.`,
+                (spending) => `Look for ways to optimize your utility usage. Small changes like turning off lights or unplugging electronics can lower your bills.`,
+                (spending) => `Consider setting up automated transfers to your savings goals. 'Set it and forget it' is a powerful savings strategy.`,
+                (spending) => `Your income is strong! Think about increasing your contributions to long-term investments or retirement funds.`
+            ],
+            // New: Dummy functions for goal-specific insights
+            goalInsightsGenerator: [
+                (goal, spending) => {
+                    const remaining = goal.target - goal.saved;
+                    if (remaining > 0) {
+                        return `To reach your '${goal.name}' goal of $${goal.target.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (need $${remaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), identify your top 3 spending categories and aim to reduce each by 10% this month.`;
+                    }
+                    return null;
+                },
+                (goal, spending) => {
+                    const diningOutSpent = spending['Dining Out'] || 0;
+                    if (diningOutSpent > 50) {
+                        return `For your '${goal.name}' goal, cutting back on dining out could make a huge difference. You've spent $${diningOutSpent.toFixed(2)} on dining out this month. Try reducing it by 25% to save over $${(diningOutSpent * 0.25).toFixed(2)} towards your goal.`;
+                    }
+                    return null;
+                },
+                (goal, spending) => {
+                    const shoppingSpent = spending['Shopping'] || 0;
+                    if (shoppingSpent > 100) {
+                        return `Consider a 'no-spend' week or month for non-essential shopping to accelerate your '${goal.name}' savings. You spent $${shoppingSpent.toFixed(2)} on shopping this month.`;
+                    }
+                    return null;
+                },
+                (goal, spending) => {
+                    const remaining = goal.target - goal.saved;
+                    const monthlySaveNeeded = remaining / 12; // To reach in 1 year
+                    if (monthlySaveNeeded > 0) {
+                        return `If you aim to save for '${goal.name}' over the next year, try to put aside at least $${monthlySaveNeeded.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per month. Automate this transfer!`;
+                    }
+                    return null;
+                },
+                (goal, spending) => {
+                    if (goal.target > 2000) { // Larger goals
+                        return `For a big goal like '${goal.name}', explore side hustles or selling unused items. Extra income can dramatically boost your progress.`;
+                    }
+                    return null;
+                },
+                (goal, spending) => {
+                    return `Review your current budget limits in the Settings tab. Can you slightly decrease limits in non-essential categories to free up funds for '${goal.name}'?`;
+                },
+                (goal, spending) => {
+                    return `Track every small expense for a week. You might be surprised where little amounts go, and these can be redirected to your '${goal.name}' goal.`;
+                }
+            ]
+        };
+
+        // --- DOM Elements Cache ---
+        const DOMElements = {
+            splashScreen: document.getElementById('splash-screen'),
+            appRoot: document.getElementById('app-root'),
+            dashboardTab: document.getElementById('dashboard-tab'),
+            insightsTab: document.getElementById('insights-tab'),
+            goalsTab: document.getElementById('goals-tab'),
+            settingsTab: document.getElementById('settings-tab'), 
+            dashboardView: document.getElementById('dashboard-view'),
+            insightsView: document.getElementById('insights-view'),
+            goalsView: document.getElementById('goals-view'),
+            settingsView: document.getElementById('settings-view'), 
+            currentBalanceDisplay: document.getElementById('current-balance'),
+            monthlyExpensesDisplay: document.getElementById('monthly-expenses'),
+            categorySpendingSummary: document.getElementById('category-spending-summary'),
+            noCategorySpending: document.getElementById('no-category-spending'),
+            recentTransactionsList: document.getElementById('recent-transactions-list'),
+            noTransactions: document.getElementById('no-transactions'),
+            addExpenseBtn: document.getElementById('add-expense-btn'),
+            insightsContainer: document.getElementById('insights-container'),
+            generateInsightsBtn: document.getElementById('generate-insights-btn'),
+            insightsLoading: document.getElementById('insights-loading'),
+            goalsList: document.getElementById('goals-list'),
+            noGoals: document.getElementById('no-goals'),
+            goalNameInput: document.getElementById('goal-name'),
+            goalAmountInput: document.getElementById('goal-amount'),
+            addGoalBtn: document.getElementById('add-goal-btn'),
+            goalRecommendationsSection: document.getElementById('goal-recommendations-section'), // New
+            goalRecommendationsTitle: document.getElementById('goal-recommendations-title'), // New
+            goalRecommendationsList: document.getElementById('goal-recommendations-list'), // New
+            closeRecommendationsBtn: document.getElementById('close-recommendations-btn'), // New
+            addExpenseModal: document.getElementById('add-expense-modal'),
+            expenseDescriptionInput: document.getElementById('expense-description'),
+            expenseAmountInput: document.getElementById('expense-amount'),
+            expenseCategorySelect: document.getElementById('expense-category'),
+            expenseDateInput: document.getElementById('expense-date'),
+            cancelExpenseBtn: document.getElementById('cancel-expense-btn'),
+            saveExpenseBtn: document.getElementById('save-expense-btn'),
+            manualBalanceInput: document.getElementById('manual-balance-input'), 
+            updateBalanceBtn: document.getElementById('update-balance-btn'), 
+            categoryList: document.getElementById('category-list'), 
+            newCategoryInput: document.getElementById('new-category-input'), 
+            addCategoryBtn: document.getElementById('add-category-btn'), 
+            budgetLimitsContainer: document.getElementById('budget-limits-container'), 
+            noBudgetsSet: document.getElementById('no-budgets-set'), 
+            saveBudgetsBtn: document.getElementById('save-budgets-btn'), 
+            resetAppBtn: document.getElementById('reset-app-btn'), 
+        };
+
+        // --- Utility Functions ---
+
+        /**
+         * Updates the UI based on the current appState.
+         */
+        function renderUI() {
+            // Splash screen visibility handled by initial load
+            
+            // Tab active states
+            DOMElements.dashboardTab.classList.toggle('bg-green-600', appState.currentView === 'dashboard');
+            DOMElements.dashboardTab.classList.toggle('text-white', appState.currentView === 'dashboard');
+            DOMElements.dashboardTab.classList.toggle('hover:bg-green-700', appState.currentView === 'dashboard');
+            DOMElements.dashboardTab.classList.toggle('bg-gray-700', appState.currentView !== 'dashboard');
+            DOMElements.dashboardTab.classList.toggle('text-gray-300', appState.currentView !== 'dashboard');
+            DOMElements.dashboardTab.classList.toggle('hover:bg-gray-600', appState.currentView !== 'dashboard');
+            
+            DOMElements.insightsTab.classList.toggle('bg-green-600', appState.currentView === 'insights');
+            DOMElements.insightsTab.classList.toggle('text-white', appState.currentView === 'insights');
+            DOMElements.insightsTab.classList.toggle('hover:bg-green-700', appState.currentView === 'insights');
+            DOMElements.insightsTab.classList.toggle('bg-gray-700', appState.currentView !== 'insights');
+            DOMElements.insightsTab.classList.toggle('text-gray-300', appState.currentView !== 'insights');
+            DOMElements.insightsTab.classList.toggle('hover:bg-gray-600', appState.currentView !== 'insights');
+
+            DOMElements.goalsTab.classList.toggle('bg-green-600', appState.currentView === 'goals');
+            DOMElements.goalsTab.classList.toggle('text-white', appState.currentView === 'goals');
+            DOMElements.goalsTab.classList.toggle('hover:bg-green-700', appState.currentView === 'goals');
+            DOMElements.goalsTab.classList.toggle('bg-gray-700', appState.currentView !== 'goals');
+            DOMElements.goalsTab.classList.toggle('text-gray-300', appState.currentView !== 'goals');
+            DOMElements.goalsTab.classList.toggle('hover:bg-gray-600', appState.currentView !== 'goals');
+
+            DOMElements.settingsTab.classList.toggle('bg-green-600', appState.currentView === 'settings');
+            DOMElements.settingsTab.classList.toggle('text-white', appState.currentView === 'settings');
+            DOMElements.settingsTab.classList.toggle('hover:bg-green-700', appState.currentView === 'settings');
+            DOMElements.settingsTab.classList.toggle('bg-gray-700', appState.currentView !== 'settings');
+            DOMElements.settingsTab.classList.toggle('text-gray-300', appState.currentView !== 'settings');
+            DOMElements.settingsTab.classList.toggle('hover:bg-gray-600', appState.currentView !== 'settings');
+
+            // View visibility
+            DOMElements.dashboardView.classList.toggle('hidden', appState.currentView !== 'dashboard');
+            DOMElements.insightsView.classList.toggle('hidden', appState.currentView !== 'insights');
+            DOMElements.goalsView.classList.toggle('hidden', appState.currentView !== 'goals');
+            DOMElements.settingsView.classList.toggle('hidden', appState.currentView !== 'settings');
+
+            // Insights loading state
+            DOMElements.generateInsightsBtn.disabled = appState.loadingInsights;
+            DOMElements.generateInsightsBtn.classList.toggle('opacity-70', appState.loadingInsights);
+            DOMElements.generateInsightsBtn.classList.toggle('cursor-not-allowed', appState.loadingInsights);
+            DOMElements.insightsLoading.classList.toggle('hidden', !appState.loadingInsights);
+
+            // Render dashboard data
+            renderDashboard();
+            // Render goals list
+            renderGoals();
+            // Render settings (categories and budget limits)
+            renderSettings();
+            // Render goal recommendations
+            renderGoalRecommendations(); // New call
+        }
+
+        /**
+         * Updates the global appState and triggers a UI re-render.
+         * @param {Object} newState - Partial state object to merge.
+         */
+        function updateState(newState) {
+            appState = { ...appState, ...newState };
+            renderUI();
+        }
+
+        /**
+         * Calculates the total monthly expenses for the current month.
+         * @returns {number} The total monthly expenses.
+         */
+        function calculateMonthlyExpenses() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            return appState.expenses.reduce((total, expense) => {
+                const expenseDate = new Date(expense.date);
+                if (expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear) {
+                    return total + expense.amount;
+                }
+                return total;
+            }, 0);
+        }
+
+        /**
+         * Calculates spending for each category for the current month.
+         * @returns {Object} An object with category names as keys and total spending as values.
+         */
+        function calculateCategorySpending() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const categorySpending = {};
+
+            appState.categories.forEach(cat => categorySpending[cat] = 0); // Initialize all to 0
+
+            appState.expenses.forEach(expense => {
+                const expenseDate = new Date(expense.date);
+                if (expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear) {
+                    if (appState.categories.includes(expense.category)) { // Only count if category exists
+                        categorySpending[expense.category] += expense.amount;
+                    }
+                }
+            });
+            return categorySpending;
+        }
+
+        /**
+         * Renders the dashboard view with current financial data.
+         */
+        function renderDashboard() {
+            const monthlyExpenses = calculateMonthlyExpenses();
+            const categorySpending = calculateCategorySpending();
+
+            DOMElements.currentBalanceDisplay.textContent = `$${appState.currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            DOMElements.monthlyExpensesDisplay.textContent = `$${monthlyExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            // Render category spending summary
+            DOMElements.categorySpendingSummary.innerHTML = '';
+            let hasCategorySpending = false;
+            // Iterate over appState.categories to ensure all categories are shown even if 0 spent
+            for (const category of appState.categories) {
+                const spent = categorySpending[category] || 0;
+                const limit = appState.budgetLimits[category] || 0;
+                const percentage = limit > 0 ? (spent / limit) * 100 : (spent > 0 ? 100 : 0);
+                const progressColor = percentage > 100 ? 'bg-red-500' : 'bg-green-500';
+
+                // Display only if there's spending or a budget limit set
+                if (spent > 0 || limit > 0) {
+                    hasCategorySpending = true;
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.classList.add('bg-gray-700', 'p-4', 'rounded-xl', 'shadow-md', 'border', 'border-gray-600');
+                    categoryDiv.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-lg font-semibold text-white font-inter">${category}</span>
+                            <span class="text-lg font-bold text-white font-inter">$${spent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / $${limit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div class="w-full bg-gray-600 rounded-full h-3">
+                            <div class="${progressColor} h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%;"></div>
+                        </div>
+                        <p class="text-right text-sm ${percentage > 100 ? 'text-red-300' : 'text-gray-400'} mt-1 font-inter">${Math.round(percentage)}% ${percentage > 100 ? 'OVER' : 'spent'}</p>
+                    `;
+                    DOMElements.categorySpendingSummary.appendChild(categoryDiv);
+                }
+            }
+            DOMElements.noCategorySpending.classList.toggle('hidden', hasCategorySpending);
+
+
+            // Render recent transactions
+            DOMElements.recentTransactionsList.innerHTML = '';
+            if (appState.expenses.length === 0) {
+                DOMElements.noTransactions.classList.remove('hidden');
+            } else {
+                DOMElements.noTransactions.classList.add('hidden');
+                // Sort by date, newest first, and take top 5
+                const sortedExpenses = [...appState.expenses].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+                sortedExpenses.forEach(expense => {
+                    const transactionLi = document.createElement('li');
+                    transactionLi.classList.add('flex', 'justify-between', 'items-center', 'bg-gray-700', 'p-4', 'rounded-xl', 'shadow-md', 'border', 'border-gray-600');
+                    transactionLi.innerHTML = `
+                        <div>
+                            <span class="text-lg text-white font-inter">${expense.description}</span>
+                            <p class="text-sm text-gray-400 font-inter">${expense.category} - ${new Date(expense.date).toLocaleDateString()}</p>
+                        </div>
+                        <span class="text-lg text-red-400 font-bold">-$${expense.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    `;
+                    DOMElements.recentTransactionsList.appendChild(transactionLi);
+                });
+            }
+        }
+
+        /**
+         * Simulates fetching AI insights based on current spending.
+         * In a real app, this would involve an API call to a generative AI model.
+         */
+        function generateInsights() {
+            updateState({ loadingInsights: true });
+            DOMElements.insightsContainer.innerHTML = ''; // Clear existing insights
+
+            const categorySpending = calculateCategorySpending();
+            const monthlyExpenses = calculateMonthlyExpenses();
+            const availableCategories = appState.categories.filter(cat => categorySpending[cat] > 0 || appState.budgetLimits[cat] > 0);
+
+            let generatedInsightsCount = 0;
+            const insightsToGenerate = 3;
+
+            // Simple logic for AI insights based on current (mock) data
+            const insightsQueue = [];
+
+            // Add insights about categories over budget
+            for (const category of availableCategories) {
+                const spent = categorySpending[category] || 0;
+                const limit = appState.budgetLimits[category] || 0;
+                if (limit > 0 && spent > limit) {
+                    const overAmount = (spent - limit).toFixed(2);
+                    insightsQueue.push(`Warning: You're over budget in '${category}' by $${overAmount}! Consider cutting back or adjusting your limit.`);
+                }
+            }
+
+            // Add insights about general spending/saving
+            if (monthlyExpenses > (appState.currentBalance * 0.4) ) { // If expenses are high relative to balance
+                 insightsQueue.push("Your current monthly expenses are high compared to your balance. Look for areas to reduce spending, especially non-essentials.");
+            } else if (monthlyExpenses < (appState.currentBalance * 0.2)) {
+                insightsQueue.push("Excellent work keeping your expenses low! Consider increasing your savings contributions or investing.");
+            }
+
+            // Add general tips from generalInsights, trying to get relevant ones
+            const relevantGeneralInsights = appState.generalInsights.filter(insightFunc => {
+                const text = typeof insightFunc === 'function' ? insightFunc(categorySpending).toLowerCase() : insightFunc.toLowerCase(); // Evaluate for keywords
+                return (text.includes('dining out') && categorySpending['Dining Out'] > 0) ||
+                       (text.includes('subscriptions') && Object.keys(appState.budgetLimits).length > 3) ||
+                       (text.includes('groceries') && categorySpending['Groceries'] > 0);
+            });
+
+            const shuffledGeneralInsights = [...relevantGeneralInsights, ...appState.generalInsights].sort(() => 0.5 - Math.random());
+            
+            for (let i = 0; i < shuffledGeneralInsights.length && generatedInsightsCount < insightsToGenerate; i++) {
+                let insightText;
+                if (typeof shuffledGeneralInsights[i] === 'function') {
+                    insightText = shuffledGeneralInsights[i](categorySpending);
+                } else {
+                    insightText = shuffledGeneralInsights[i];
+                }
+                insightsQueue.push(insightText);
+                generatedInsightsCount++;
+            }
+            
+            // Ensure unique insights and limit to 3
+            const uniqueInsights = Array.from(new Set(insightsQueue)).slice(0, insightsToGenerate);
+
+
+            setTimeout(() => {
+                if (uniqueInsights.length === 0) {
+                     const insightDiv = document.createElement('div');
+                    insightDiv.classList.add('bg-gray-700', 'p-6', 'rounded-2xl', 'shadow-lg', 'border', 'border-gray-600', 'animate-fade-in');
+                    insightDiv.innerHTML = `
+                        <h3 class="text-xl font-semibold text-yellow-200 mb-2 font-inter">No Specific Insights Yet!</h3>
+                        <p class="text-gray-200 font-inter">Add more expenses and set budgets to get personalized advice. Keep up the good work!</p>
+                    `;
+                    DOMElements.insightsContainer.appendChild(insightDiv);
+                } else {
+                    uniqueInsights.forEach((insight, index) => {
+                        const insightDiv = document.createElement('div');
+                        insightDiv.classList.add('bg-gray-700', 'p-6', 'rounded-2xl', 'shadow-lg', 'border', 'border-gray-600', 'animate-fade-in');
+                        insightDiv.style.animationDelay = `${index * 0.15}s`;
+                        insightDiv.innerHTML = `
+                            <h3 class="text-xl font-semibold text-yellow-200 mb-2 font-inter">Insight ${index + 1}</h3>
+                            <p class="text-gray-200 font-inter">${insight}</p>
+                        `;
+                        DOMElements.insightsContainer.appendChild(insightDiv);
+                    });
+                }
+                updateState({ loadingInsights: false });
+            }, 2000); // Simulate network delay
+        }
+
+        /**
+         * Renders the list of financial goals.
+         */
+        function renderGoals() {
+            DOMElements.goalsList.innerHTML = ''; // Clear existing goals
+            if (appState.goals.length === 0) {
+                DOMElements.noGoals.classList.remove('hidden');
+            } else {
+                DOMElements.noGoals.classList.add('hidden');
+                appState.goals.forEach((goal, index) => {
+                    const percentage = (goal.saved / goal.target) * 100;
+                    const goalDiv = document.createElement('div');
+                    goalDiv.classList.add('bg-gray-700', 'p-6', 'rounded-2xl', 'shadow-lg', 'border', 'border-gray-600', 'animate-fade-in');
+                    goalDiv.style.animationDelay = `${index * 0.1}s`;
+                    goalDiv.innerHTML = `
+                        <h3 class="text-xl font-semibold text-teal-200 mb-2 font-inter">${goal.name}</h3>
+                        <p class="text-gray-300 mb-3 font-inter">Target: <span class="font-bold">$${goal.target.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> | Saved: <span class="font-bold text-green-300">$${goal.saved.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                        <div class="w-full bg-gray-600 rounded-full h-3">
+                            <div class="bg-green-500 h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%;"></div>
+                        </div>
+                        <p class="text-right text-sm text-gray-400 mt-1 font-inter">${Math.round(percentage)}% Complete</p>
+                        <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                            <button class="flex-1 py-2 px-4 rounded-lg bg-blue-500 text-white font-bold hover:bg-blue-600 transition-colors view-recommendations-btn" data-id="${goal.id}">
+                                View Recommendations
+                            </button>
+                            <button class="flex-1 py-2 px-4 rounded-lg bg-red-500 text-white font-bold hover:bg-red-600 transition-colors remove-goal-btn" data-id="${goal.id}">
+                                Remove
+                            </button>
+                        </div>
+                    `;
+                    DOMElements.goalsList.appendChild(goalDiv);
+                });
+            }
+
+            document.querySelectorAll('.remove-goal-btn').forEach(button => {
+                button.onclick = (e) => removeGoal(e.target.dataset.id);
+            });
+            document.querySelectorAll('.view-recommendations-btn').forEach(button => {
+                button.onclick = (e) => viewGoalRecommendations(e.target.dataset.id); // New handler
+            });
+        }
+
+        /**
+         * Adds a new financial goal to the state and local storage.
+         */
+        function addGoal() {
+            const name = DOMElements.goalNameInput.value.trim();
+            const amount = parseFloat(DOMElements.goalAmountInput.value);
+
+            if (!name || isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid goal name and a positive target amount.');
+                return;
+            }
+
+            const newGoal = {
+                id: Date.now().toString(), // Simple unique ID
+                name: name,
+                target: amount,
+                saved: 0 // Start with 0 saved
+            };
+
+            const updatedGoals = [...appState.goals, newGoal];
+            localStorage.setItem('pennywise_goals', JSON.stringify(updatedGoals));
+            updateState({ goals: updatedGoals });
+
+            // Clear inputs
+            DOMElements.goalNameInput.value = '';
+            DOMElements.goalAmountInput.value = '';
+
+            // Automatically show recommendations for the newly added goal
+            viewGoalRecommendations(newGoal.id);
+        }
+
+        /**
+         * Removes a goal from the state and local storage.
+         * @param {string} id - The ID of the goal to remove.
+         */
+        function removeGoal(id) {
+            if (appState.selectedGoalForRecommendations && appState.selectedGoalForRecommendations.id === id) {
+                updateState({ selectedGoalForRecommendations: null }); // Hide recs if goal is removed
+            }
+            const updatedGoals = appState.goals.filter(goal => goal.id !== id);
+            localStorage.setItem('pennywise_goals', JSON.stringify(updatedGoals));
+            updateState({ goals: updatedGoals });
+        }
+
+        /**
+         * Sets the selected goal for recommendations and triggers their generation and display.
+         * @param {string} goalId - The ID of the goal to show recommendations for.
+         */
+        function viewGoalRecommendations(goalId) {
+            const selectedGoal = appState.goals.find(g => g.id === goalId);
+            if (selectedGoal) {
+                updateState({ selectedGoalForRecommendations: selectedGoal, currentView: 'goals' });
+                generateGoalRecommendations(selectedGoal);
+            }
+        }
+
+        /**
+         * Generates and displays recommendations for the selected goal.
+         * @param {object} goal - The goal object for which to generate recommendations.
+         */
+        function generateGoalRecommendations(goal) {
+            DOMElements.goalRecommendationsTitle.textContent = `Recommendations for "${goal.name}"`;
+            DOMElements.goalRecommendationsList.innerHTML = ''; // Clear previous recommendations
+
+            const categorySpending = calculateCategorySpending();
+            const insightsQueue = [];
+            const generatedCount = 0;
+            const insightsToGenerate = 3; // Aim for 3 unique insights
+
+            // Try to get specific insights first
+            appState.goalInsightsGenerator.forEach(insightFunc => {
+                const insightText = insightFunc(goal, categorySpending);
+                if (insightText && !insightsQueue.includes(insightText)) {
+                    insightsQueue.push(insightText);
+                }
+            });
+
+            // Fallback to general insights if not enough specific ones
+            if (insightsQueue.length < insightsToGenerate) {
+                const shuffledGeneral = [...appState.generalInsights].sort(() => 0.5 - Math.random());
+                shuffledGeneral.forEach(insightFunc => {
+                    const insightText = typeof insightFunc === 'function' ? insightFunc(categorySpending) : insightFunc;
+                    if (insightText && !insightsQueue.includes(insightText) && insightsQueue.length < insightsToGenerate) {
+                        insightsQueue.push(insightText);
+                    }
+                });
+            }
+            
+            // Display insights
+            if (insightsQueue.length === 0) {
+                DOMElements.goalRecommendationsList.innerHTML = `<p class="text-gray-300 text-center font-inter">No specific recommendations yet. Keep tracking your finances!</p>`;
+            } else {
+                insightsQueue.slice(0, insightsToGenerate).forEach((rec, index) => {
+                    const recDiv = document.createElement('div');
+                    recDiv.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'shadow-md', 'border', 'border-gray-600', 'animate-fade-in');
+                    recDiv.style.animationDelay = `${index * 0.1}s`; /* Corrected line */
+                    recDiv.innerHTML = `
+                        <p class="text-gray-200 font-inter">${rec}</p>
+                    `;
+                    DOMElements.goalRecommendationsList.appendChild(recDiv);
+                });
+            }
+        }
+
+        /**
+         * Renders the goal recommendations section based on `appState.selectedGoalForRecommendations`.
+         */
+        function renderGoalRecommendations() {
+            if (appState.selectedGoalForRecommendations) {
+                DOMElements.goalRecommendationsSection.classList.remove('hidden');
+                // Re-render recommendations content if the section is becoming visible or goal changed
+                generateGoalRecommendations(appState.selectedGoalForRecommendations);
+            } else {
+                DOMElements.goalRecommendationsSection.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Hides the goal recommendations section.
+         */
+        function hideGoalRecommendations() {
+            updateState({ selectedGoalForRecommendations: null });
+        }
+
+
+        /**
+         * Shows the add expense modal.
+         */
+        function showAddExpenseModal() {
+            DOMElements.addExpenseModal.classList.remove('hidden');
+            // Populate category select
+            DOMElements.expenseCategorySelect.innerHTML = appState.categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            // Set default date to today
+            DOMElements.expenseDateInput.value = new Date().toISOString().split('T')[0];
+        }
+
+        /**
+         * Hides the add expense modal.
+         */
+        function hideAddExpenseModal() {
+            DOMElements.addExpenseModal.classList.add('hidden');
+            // Clear form
+            DOMElements.expenseDescriptionInput.value = '';
+            DOMElements.expenseAmountInput.value = '';
+            DOMElements.expenseCategorySelect.value = appState.categories[0] || '';
+            DOMElements.expenseDateInput.value = '';
+        }
+
+        /**
+         * Adds a new expense from the modal.
+         */
+        function addExpense() {
+            const description = DOMElements.expenseDescriptionInput.value.trim();
+            const amount = parseFloat(DOMElements.expenseAmountInput.value);
+            const category = DOMElements.expenseCategorySelect.value;
+            const date = DOMElements.expenseDateInput.value;
+
+            if (!description || isNaN(amount) || amount <= 0 || !category || !date) {
+                alert('Please fill in all expense details correctly.');
+                return;
+            }
+
+            const newExpense = {
+                id: Date.now().toString(),
+                description: description,
+                amount: amount,
+                category: category,
+                date: date
+            };
+
+            const updatedExpenses = [...appState.expenses, newExpense];
+            const newBalance = appState.currentBalance - amount;
+
+            localStorage.setItem('pennywise_expenses', JSON.stringify(updatedExpenses));
+            localStorage.setItem('pennywise_balance', newBalance.toFixed(2));
+
+            updateState({ expenses: updatedExpenses, currentBalance: newBalance });
+            hideAddExpenseModal();
+        }
+
+        /**
+         * Renders the settings view, including category management and budget limits.
+         */
+        function renderSettings() {
+            // Set manual balance input value
+            DOMElements.manualBalanceInput.value = appState.currentBalance.toFixed(2);
+
+            // Render categories
+            DOMElements.categoryList.innerHTML = '';
+            appState.categories.forEach(category => {
+                const li = document.createElement('li');
+                li.classList.add('flex', 'justify-between', 'items-center', 'bg-gray-800', 'p-3', 'rounded-lg', 'border', 'border-gray-600');
+                li.innerHTML = `
+                    <span class="text-white text-lg font-inter">${category}</span>
+                    <button class="text-red-400 hover:text-red-500 transition-colors remove-category-btn" data-category="${category}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                DOMElements.categoryList.appendChild(li);
+            });
+
+            document.querySelectorAll('.remove-category-btn').forEach(button => {
+                button.onclick = (e) => removeCategory(e.target.dataset.category || e.target.closest('button').dataset.category);
+            });
+
+
+            // Render budget limits
+            DOMElements.budgetLimitsContainer.innerHTML = '';
+            if (appState.categories.length === 0) {
+                 DOMElements.noBudgetsSet.classList.remove('hidden');
+            } else {
+                DOMElements.noBudgetsSet.classList.add('hidden');
+                appState.categories.forEach(category => {
+                    const limit = appState.budgetLimits[category] || 0;
+                    const div = document.createElement('div');
+                    div.classList.add('flex', 'items-center', 'gap-4', 'bg-gray-700', 'p-4', 'rounded-lg', 'shadow-md', 'border', 'border-gray-600');
+                    div.innerHTML = `
+                        <label for="budget-${category}" class="flex-grow text-gray-300 text-lg font-inter">${category}:</label>
+                        <span class="text-gray-300 font-inter">$</span>
+                        <input type="number" id="budget-${category}" class="flex-shrink-0 w-28 p-2 rounded-lg bg-gray-800 border border-gray-600 text-white font-inter budget-input" value="${limit}" data-category="${category}">
+                    `;
+                    DOMElements.budgetLimitsContainer.appendChild(div);
+                });
+            }
+        }
+
+        /**
+         * Adds a new category.
+         */
+        function addCategory() {
+            const newCategory = DOMElements.newCategoryInput.value.trim();
+            if (newCategory && !appState.categories.includes(newCategory)) {
+                const updatedCategories = [...appState.categories, newCategory];
+                const updatedBudgetLimits = { ...appState.budgetLimits, [newCategory]: 0 }; // Add with default 0 budget
+                localStorage.setItem('pennywise_categories', JSON.stringify(updatedCategories));
+                localStorage.setItem('pennywise_budget_limits', JSON.stringify(updatedBudgetLimits));
+                updateState({ categories: updatedCategories, budgetLimits: updatedBudgetLimits });
+                DOMElements.newCategoryInput.value = '';
+            } else if (newCategory && appState.categories.includes(newCategory)) {
+                alert('Category already exists!');
+            }
+        }
+
+        /**
+         * Removes a category.
+         * @param {string} categoryToRemove - The category name to remove.
+         */
+        function removeCategory(categoryToRemove) {
+            if (confirm(`Are you sure you want to remove the category "${categoryToRemove}"? This will not remove existing expenses in this category.`)) {
+                const updatedCategories = appState.categories.filter(cat => cat !== categoryToRemove);
+                const updatedBudgetLimits = { ...appState.budgetLimits };
+                delete updatedBudgetLimits[categoryToRemove]; // Remove budget for this category
+
+                localStorage.setItem('pennywise_categories', JSON.stringify(updatedCategories));
+                localStorage.setItem('pennywise_budget_limits', JSON.stringify(updatedBudgetLimits));
+                updateState({ categories: updatedCategories, budgetLimits: updatedBudgetLimits });
+            }
+        }
+
+        /**
+         * Saves the updated budget limits.
+         */
+        function saveBudgetLimits() {
+            const updatedBudgetLimits = { ...appState.budgetLimits };
+            DOMElements.budgetLimitsContainer.querySelectorAll('.budget-input').forEach(input => {
+                const category = input.dataset.category;
+                const limit = parseFloat(input.value);
+                if (!isNaN(limit) && limit >= 0) {
+                    updatedBudgetLimits[category] = limit;
+                } else {
+                    updatedBudgetLimits[category] = 0; // Default to 0 if invalid
+                }
+            });
+            localStorage.setItem('pennywise_budget_limits', JSON.stringify(updatedBudgetLimits));
+            updateState({ budgetLimits: updatedBudgetLimits });
+            alert('Monthly budgets saved!');
+        }
+
+        /**
+         * Manually updates the current bank balance.
+         */
+        function updateBalanceManually() {
+            const newBalance = parseFloat(DOMElements.manualBalanceInput.value);
+            if (isNaN(newBalance)) {
+                alert('Please enter a valid number for your balance.');
+                return;
+            }
+            localStorage.setItem('pennywise_balance', newBalance.toFixed(2));
+            updateState({ currentBalance: newBalance });
+            alert('Bank balance updated successfully!');
+        }
+
+        /**
+         * Resets all app data.
+         */
+        function resetAppData() {
+            if (confirm('Are you sure you want to reset ALL app data (expenses, goals, categories, budgets, balance)? This action cannot be undone.')) {
+                localStorage.clear(); // Clear all local storage data
+                // Reset appState to initial values
+                appState = {
+                    currentView: 'dashboard',
+                    currentBalance: 5000.00,
+                    expenses: [],
+                    goals: [],
+                    categories: ['Groceries', 'Utilities', 'Rent', 'Transport', 'Entertainment', 'Dining Out', 'Shopping', 'Health', 'Education', 'Salary'],
+                    budgetLimits: {
+                        'Groceries': 400, 'Utilities': 150, 'Rent': 1000, 'Transport': 100, 'Entertainment': 80,
+                        'Dining Out': 120, 'Shopping': 200, 'Health': 50, 'Education': 30
+                    },
+                    loadingInsights: false,
+                    selectedGoalForRecommendations: null,
+                    generalInsights: [
+                        (spending) => `You've spent $${spending['Dining Out'] ? spending['Dining Out'].toFixed(2) : '0.00'} on dining out this month. Consider cooking at home more often to save an estimated $50-$100!`,
+                        (spending) => `Your entertainment spending is $${spending['Entertainment'] ? spending['Entertainment'].toFixed(2) : '0.00'}. Try free activities or look for discounts to stay within your budget.`,
+                        (spending) => `Great job managing your rent! It's a significant expense, and keeping it stable is key to financial health.`,
+                        (spending) => `Your transport costs ($${spending['Transport'] ? spending['Transport'].toFixed(2) : '0.00'}) seem manageable. Exploring public transport or cycling could offer further savings.`,
+                        (spending) => `Groceries are at $${spending['Groceries'] ? spending['Groceries'].toFixed(2) : '0.00'}. Planning your meals and making a list before shopping can help reduce impulse buys and waste.`,
+                        (spending) => `You're doing well with your budget overall! Keep tracking your expenses diligently for continued financial clarity.`,
+                        (spending) => `Review your monthly subscriptions. Even small forgotten payments can add up to significant savings over time.`,
+                        (spending) => `Look for ways to optimize your utility usage. Small changes like turning off lights or unplugging electronics can lower your bills.`,
+                        (spending) => `Consider setting up automated transfers to your savings goals. 'Set it and forget it' is a powerful savings strategy.`,
+                        (spending) => `Your income is strong! Think about increasing your contributions to long-term investments or retirement funds.`
+                    ],
+                    goalInsightsGenerator: [
+                        (goal, spending) => {
+                            const remaining = goal.target - goal.saved;
+                            if (remaining > 0) {
+                                return `To reach your '${goal.name}' goal of $${goal.target.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (need $${remaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), identify your top 3 spending categories and aim to reduce each by 10% this month.`;
+                            }
+                            return null;
+                        },
+                        (goal, spending) => {
+                            const diningOutSpent = spending['Dining Out'] || 0;
+                            if (diningOutSpent > 50) {
+                                return `For your '${goal.name}' goal, cutting back on dining out could make a huge difference. You've spent $${diningOutSpent.toFixed(2)} on dining out this month. Try reducing it by 25% to save over $${(diningOutSpent * 0.25).toFixed(2)} towards your goal.`;
+                            }
+                            return null;
+                        },
+                        (goal, spending) => {
+                            const shoppingSpent = spending['Shopping'] || 0;
+                            if (shoppingSpent > 100) {
+                                return `Consider a 'no-spend' week or month for non-essential shopping to accelerate your '${goal.name}' savings. You spent $${shoppingSpent.toFixed(2)} on shopping this month.`;
+                            }
+                            return null;
+                        },
+                        (goal, spending) => {
+                            const remaining = goal.target - goal.saved;
+                            const monthlySaveNeeded = remaining / 12; // To reach in 1 year
+                            if (monthlySaveNeeded > 0) {
+                                return `If you aim to save for '${goal.name}' over the next year, try to put aside at least $${monthlySaveNeeded.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per month. Automate this transfer!`;
+                            }
+                            return null;
+                        },
+                        (goal, spending) => {
+                            if (goal.target > 2000) { // Larger goals
+                                return `For a big goal like '${goal.name}', explore side hustles or selling unused items. Extra income can dramatically boost your progress.`;
+                            }
+                            return null;
+                        },
+                        (goal, spending) => {
+                            return `Review your current budget limits in the Settings tab. Can you slightly decrease limits in non-essential categories to free up funds for '${goal.name}'?`;
+                        },
+                        (goal, spending) => {
+                            return `Track every small expense for a week. You might be surprised where little amounts go, and these can be redirected to your '${goal.name}' goal.`;
+                        }
+                    ]
+                };
+                alert('All app data has been reset!');
+                // Re-initialize local storage with default values after reset
+                localStorage.setItem('pennywise_balance', appState.currentBalance.toFixed(2));
+                localStorage.setItem('pennywise_expenses', JSON.stringify(appState.expenses));
+                localStorage.setItem('pennywise_goals', JSON.stringify(appState.goals));
+                localStorage.setItem('pennywise_categories', JSON.stringify(appState.categories));
+                localStorage.setItem('pennywise_budget_limits', JSON.stringify(appState.budgetLimits));
+
+                updateState({}); // Trigger full re-render
+            }
+        }
+
+
+        // --- Event Listeners and Initial Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Define splash screen transition duration from CSS for accurate timing
+            const splashTransitionDuration = parseFloat(getComputedStyle(DOMElements.splashScreen).transitionDuration) * 1000; // Convert to milliseconds
+
+            // Hide splash screen after its animations
+            setTimeout(() => {
+                DOMElements.splashScreen.classList.add('opacity-0');
+                DOMElements.splashScreen.style.pointerEvents = 'none'; // Disable interactions immediately
+
+                setTimeout(() => {
+                    DOMElements.splashScreen.style.display = 'none'; // Hide completely
+                    DOMElements.appRoot.classList.remove('app-hidden'); // Show app-root
+                    document.body.style.overflow = 'auto'; // Re-enable scrolling
+                    // Initial render of insights and goals once app is visible
+                    generateInsights(); // Generate initial insights
+                }, splashTransitionDuration); // Wait for splash fade-out transition
+            }, 3000); // Display splash for 3 seconds initially
+
+            // Load data from local storage
+            const storedBalance = localStorage.getItem('pennywise_balance');
+            if (storedBalance) {
+                appState.currentBalance = parseFloat(storedBalance);
+            }
+            const storedExpenses = localStorage.getItem('pennywise_expenses');
+            if (storedExpenses) {
+                try { appState.expenses = JSON.parse(storedExpenses); } catch (e) { console.error("Failed to parse expenses:", e); appState.expenses = []; }
+            }
+            const storedGoals = localStorage.getItem('pennywise_goals');
+            if (storedGoals) {
+                try { appState.goals = JSON.parse(storedGoals); } catch (e) { console.error("Failed to parse goals:", e); appState.goals = []; }
+            }
+            const storedCategories = localStorage.getItem('pennywise_categories');
+            if (storedCategories) {
+                try { appState.categories = JSON.parse(storedCategories); } catch (e) { console.error("Failed to parse categories:", e); }
+            }
+             const storedBudgetLimits = localStorage.getItem('pennywise_budget_limits');
+            if (storedBudgetLimits) {
+                try { appState.budgetLimits = JSON.parse(storedBudgetLimits); } catch (e) { console.error("Failed to parse budget limits:", e); }
+            }
+            
+            // Navigation tab listeners
+            DOMElements.dashboardTab.addEventListener('click', () => updateState({ currentView: 'dashboard' }));
+            DOMElements.insightsTab.addEventListener('click', () => {
+                updateState({ currentView: 'insights' });
+                generateInsights(); // Re-generate insights when tab is clicked
+            });
+            DOMElements.goalsTab.addEventListener('click', () => updateState({ currentView: 'goals' }));
+            DOMElements.settingsTab.addEventListener('click', () => updateState({ currentView: 'settings' }));
+
+            // Dashboard buttons
+            DOMElements.addExpenseBtn.addEventListener('click', showAddExpenseModal);
+
+            // Expense Modal buttons
+            DOMElements.cancelExpenseBtn.addEventListener('click', hideAddExpenseModal);
+            DOMElements.saveExpenseBtn.addEventListener('click', addExpense);
+
+            // Insights buttons
+            DOMElements.generateInsightsBtn.addEventListener('click', generateInsights);
+            
+            // Goals buttons
+            DOMElements.addGoalBtn.addEventListener('click', addGoal);
+            DOMElements.closeRecommendationsBtn.addEventListener('click', hideGoalRecommendations); // New listener
+
+            // Settings buttons
+            DOMElements.manualBalanceInput.addEventListener('change', () => { /* no action needed, value read on button click */ }); 
+            DOMElements.updateBalanceBtn.addEventListener('click', updateBalanceManually); 
+            DOMElements.addCategoryBtn.addEventListener('click', addCategory);
+            DOMElements.saveBudgetsBtn.addEventListener('click', saveBudgetLimits);
+            DOMElements.resetAppBtn.addEventListener('click', resetAppData);
+
+            // Initial render
+            renderUI();
+        });
+    </script>
+</body>
+</html>
